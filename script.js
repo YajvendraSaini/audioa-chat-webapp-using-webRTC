@@ -13,7 +13,7 @@ const remoteIdInput = document.getElementById('remoteId');
 const muteBtn = document.getElementById('muteBtn');
 const volumeSlider = document.getElementById('volumeSlider');
 const statusDiv = document.getElementById('status');
-const callLogDiv = document.getElementById('callLog');
+const callLogEntries = document.getElementById('callLogEntries');
 
 setUsernameBtn.addEventListener('click', setUsername);
 callBtn.addEventListener('click', startCall);
@@ -27,7 +27,7 @@ function setUsername() {
         initializePeer();
         setUsernameBtn.disabled = true;
         usernameInput.disabled = true;
-        updateStatus(`Username set to: ${username}`);
+        updateStatus(`Welcome, ${username}!`);
     } else {
         updateStatus('Please enter a valid username');
     }
@@ -39,7 +39,7 @@ function initializePeer() {
     peer.on('open', (id) => {
         myIdDisplay.textContent = `Your ID: ${id}`;
         callBtn.disabled = false;
-        updateStatus('Peer connection established. You can now make calls.');
+        updateStatus('Ready to make calls');
     });
 
     peer.on('call', (call) => {
@@ -148,5 +148,5 @@ function updateStatus(message) {
 function logCall(type, peerId) {
     const logEntry = document.createElement('p');
     logEntry.textContent = `${type === 'incoming' ? 'Incoming' : 'Outgoing'} call ${type === 'incoming' ? 'from' : 'to'} ${peerId} at ${new Date().toLocaleString()}`;
-    callLogDiv.appendChild(logEntry);
+    callLogEntries.prepend(logEntry);
 }
