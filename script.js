@@ -1,5 +1,6 @@
 let peer;
 let currentCall;
+let localStream;
 let username = '';
 let isMuted = false;
 
@@ -46,6 +47,7 @@ function initializePeer() {
         if (acceptCall) {
             navigator.mediaDevices.getUserMedia({ audio: true, video: false })
                 .then((stream) => {
+                    localStream = stream;
                     call.answer(stream);
                     handleCall(call);
                 })
@@ -70,6 +72,7 @@ function startCall() {
     if (remoteId) {
         navigator.mediaDevices.getUserMedia({ audio: true, video: false })
             .then((stream) => {
+                localStream = stream;
                 const call = peer.call(remoteId, stream);
                 handleCall(call);
             })
@@ -108,7 +111,11 @@ function endCall() {
     if (currentCall) {
         currentCall.close();
     }
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+    }
     currentCall = null;
+    localStream = null;
     hangupBtn.disabled = true;
     muteBtn.disabled = true;
     volumeSlider.disabled = true;
@@ -117,8 +124,8 @@ function endCall() {
 }
 
 function toggleMute() {
-    if (currentCall) {
-        const audioTracks = currentCall.localStream.getAudioTracks();
+    if (localStream) {
+        const audioTracks = localStream.getAudioTracks();
         audioTracks.forEach(track => {
             track.enabled = !track.enabled;
         });
